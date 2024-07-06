@@ -1,0 +1,8 @@
+@startuml
+
+package BSPs <<Frame>> {
+  class bsp_btn
+  class bsp_led
+}
+
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+
+package DeviceDrivers <<Frame>> {
+  class drv_btn
+}
+
+@enduml

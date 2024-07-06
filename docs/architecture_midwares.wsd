@@ -1,0 +1,7 @@
+@startuml
+
+package Middlewares <<Frame>> {
+  class cbuffer
+}
+
+@enduml
