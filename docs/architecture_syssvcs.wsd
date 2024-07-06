@@ -1,0 +1,9 @@
+@startuml
+
+package SystemServices <<Frame>> {
+  class sys_mng
+  class sys_btn
+  class sys_led
+}
+
+@enduml
