@@ -19,11 +19,10 @@
 #define __COMMON_
 
 /* Includes ----------------------------------------------------------- */
+#include "main.h"
 
 /* Public defines ----------------------------------------------------- */
-#define UART_DEBUG_ENABLE  1      /* Enable UART debug */
-#define PRINTF_UART_ENABLE 1      /* (1) Enable using printf() with UART */
-#define PRINTF_UART_X      huart2 /* UART port used for printf() */
+#define UART_DEBUG_ENABLE  1 /* Enable UART debug */
 
 /* Public enumerate/structure ----------------------------------------- */
 
@@ -44,30 +43,6 @@
       _cb_func_(__VA_ARGS__);    \
   } while (0)
 
-// Using printf with UART
-#if PRINTF_UART_ENABLE
-#if defined(__GNUC__)
-int _write(int fd, char *ptr, int len)
-{
-  HAL_UART_Transmit(&PRINTF_UART_X, (uint8_t *)ptr, len, HAL_MAX_DELAY);
-  return len;
-}
-#elif defined(__ICCARM__)
-#include "LowLevelIOInterface.h"
-
-size_t __write(int handle, const unsigned char *buffer, size_t size)
-{
-  HAL_UART_Transmit(&PRINTF_UART_X, (uint8_t *)buffer, size, HAL_MAX_DELAY);
-  return size;
-}
-#elif defined(__CC_ARM)
-int fputc(int ch, FILE *f)
-{
-  HAL_UART_Transmit(&PRINTF_UART_X, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-  return ch;
-}
-#endif
-#endif
 /* Public variables --------------------------------------------------- */
 
 /* Public function prototypes ----------------------------------------- */
