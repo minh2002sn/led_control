@@ -198,6 +198,7 @@ uint32_t drv_btn_handle(drv_btn_t *btn)
       btn->handle_state   = DRV_BTN_HANDLE_STATE_CHECK_RELEASE;
       btn->t_start_change = HAL_GetTick();
     }
+    break;
 
   case DRV_BTN_HANDLE_STATE_CHECK_RELEASE:
   {
@@ -209,12 +210,12 @@ uint32_t drv_btn_handle(drv_btn_t *btn)
       btn->handle_state = DRV_BTN_HANDLE_STATE_IDLE;
       CALLBACK(drv_btn_cb_func_release, btn);
     }
-    else if ((btn->gpio_state == btn->active_state) &&
-             (curr_tick - btn->t_start_change == 300))
+    else if (btn->gpio_state == btn->active_state)
     {
       btn->handle_state   = DRV_BTN_HANDLE_STATE_CHECK_ACTIVE;
       btn->t_start_change = curr_tick;
-      CALLBACK(drv_btn_cb_func_release, btn);
+      if (curr_tick - btn->t_start_change == 300)
+        CALLBACK(drv_btn_cb_func_release, btn);
     }
     break;
   }
