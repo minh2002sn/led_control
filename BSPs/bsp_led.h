@@ -54,7 +54,7 @@ enum bsp_led_msg_enum
 uint32_t bsp_led_init();
 
 /**
- * @brief           Initialize circular buffer
+ * @brief           Turn LED on
  *
  * @param[in]       led     bsp_led_t want to turn on
  *
@@ -65,7 +65,7 @@ uint32_t bsp_led_init();
 uint32_t bsp_led_on(bsp_led_t led);
 
 /**
- * @brief           Initialize circular buffer
+ * @brief           Turn LED off
  *
  * @param[in]       led     bsp_led_t want to turn off
  *
@@ -76,7 +76,7 @@ uint32_t bsp_led_on(bsp_led_t led);
 uint32_t bsp_led_off(bsp_led_t led);
 
 /**
- * @brief           Initialize circular buffer
+ * @brief           Toggle LED
  *
  * @param[in]       led     bsp_led_t want to turn toggle
  *

@@ -46,9 +46,20 @@ static bsp_led_data_t leds_data[] = {
 /* Private function prototypes ---------------------------------------- */
 
 /* Function definitions ----------------------------------------------- */
+uint32_t bsp_led_init()
+{
+}
+
 uint32_t bsp_led_on(bsp_led_t led)
 {
   HAL_GPIO_WritePin(leds_data[led].gpio_x, leds_data[led].gpio_pin, ON_STATE);
+  return BSP_LED_SUCCESS;
+}
+
+uint32_t bsp_led_off(bsp_led_t led)
+{
+  HAL_GPIO_WritePin(leds_data[led].gpio_x, leds_data[led].gpio_pin, OFF_STATE);
+  return BSP_LED_SUCCESS;
 }
 
 /* Private definitions ----------------------------------------------- */

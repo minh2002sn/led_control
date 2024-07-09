@@ -2,7 +2,28 @@
 
 package BSPs <<Frame>> {
   class bsp_btn
+  {
+    ~btns_data[]: static bsp_led_data_t
+    +bsp_btn_init(): uint32_t
+    +bsp_btn_loop(): uint32_t
+    +bsp_btn_exti_handle(): uint32_t
+    ~bsp_btn_cb_func_single_click(): void
+    ~bsp_btn_cb_func_double_click(): void
+    ~bsp_btn_cb_func_hold(): void
+    ~bsp_btn_cb_func_release(): void
+  }
+  
   class bsp_led
+  {
+    +bsp_led_init(): uint32_t
+    +bsp_led_on(): uint32_t
+    +bsp_led_off(): uint32_t
+  }
+
+  class bsp_exti
+  {
+    HAL_GPIO_EXTI_Callback(): void
+  }
 }
 
 @enduml

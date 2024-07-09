@@ -2,8 +2,35 @@
 
 package SystemServices <<Frame>> {
   class sys_mng
+  {
+    ~mng_state: static sys_mng_state_t
+    ~sys_mng_msg_from_btn_cb: static cbuffer_t
+    ~sys_mng_msg_from_btn_buff[]: static uint8_t
+    +sys_mng_init()
+    +sys_mng_loop()
+  }
   class sys_btn
+  {
+    ~sys_btn_msg_cb: static cbuffer_t
+    ~sys_btn_msg_buff[]: static uint8_t
+    +sys_btn_init()
+    +sys_btn_loop()
+  }
   class sys_led
+  {
+    ~led_state: static sys_led_state_t
+    ~sys_led_msg_cb: static cbuffer_t
+    ~sys_led_msg_buff[]: static uint8_t
+    +sys_led_init(): uint32_t
+    +sys_led_loop(): uint32_t
+    ~state_machine_handle(): void
+  }
+  class sys_prot
+  {
+    ~note_cb_ptrs[]: static cbuffer_t *
+    +sys_prot_reg_rx()
+    +sys_prot_send_msg()
+  }
 }
 
 @enduml

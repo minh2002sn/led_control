@@ -1,0 +1,11 @@
+@startuml
+
+package APPs <<Frame>> {
+  class app
+  {
+    +app_init()
+    +app_loop()
+  }
+}
+
+@enduml

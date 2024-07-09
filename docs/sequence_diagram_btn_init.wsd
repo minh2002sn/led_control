@@ -1,0 +1,19 @@
+@startuml
+
+participant SYS_BTN as "System button\n(sys_btn)"
+participant BSP_BTN as "BSP button\n(btn_mng)"
+participant DRV_BTN as "Driver button\n(drv_btn)"
+
+SYS_BTN --> SYS_BTN: Initialize circular buffer
+
+SYS_BTN --> BSP_BTN: Call bsp_btn_init() 
+
+BSP_BTN --> DRV_BTN: Call drv_btn_init()
+
+DRV_BTN --> DRV_BTN: Initialize GPIO pin,\nactive state
+
+BSP_BTN --> DRV_BTN: Call drv_btn_reg_cb_func()
+
+DRV_BTN --> DRV_BTN: Store function pointers\nof button event\ncallback functions
+
+@enduml
