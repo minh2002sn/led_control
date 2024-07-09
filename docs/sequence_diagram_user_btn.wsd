@@ -1,0 +1,33 @@
+@startuml
+
+participant USER as "User"
+participant DRV_BTN as "Driver button\n(drv_btn)"
+participant SYS_BTN as "System button\n(sys_btn)"
+participant SYS_MNG as "System manager\n(sys_mng)"
+participant SYS_LED as "System led\n(sys_led)"
+participant BSP_LED as "BSP led\n(bsp_led)"
+
+skinparam dpi 300
+
+USER    --> DRV_BTN: User using button
+
+DRV_BTN --> DRV_BTN: Debounce
+
+DRV_BTN --> DRV_BTN: Detect event
+
+DRV_BTN --> SYS_BTN: Send event by calling\nbsp_btn's callback functions\n(sys_prot_send_msg())
+note right of DRV_BTN
+  Message content is 
+  defined by sys_btn
+end note
+
+SYS_BTN --> SYS_MNG: Send message\n(sys_prot_send_msg())
+note over of SYS_MNG
+  Message content is defined by sys_mng
+end note
+
+SYS_MNG --> SYS_LED: Transfer message base on\nsystem manager state\n(sys_prot_send_msg())
+
+SYS_LED --> BSP_LED: Control led base\non led effect state
+
+@enduml

@@ -2,6 +2,21 @@
 
 package DeviceDrivers <<Frame>> {
   class drv_btn
+  {
+    -gpio_x: GPIO_TypeDef *
+    -gpio_pin: uint16_t
+    -t_start_debounce: uint32_t
+    -t_start_change: uint32_t
+    -gpio_state: uint32_t
+    -active_state: uint32_t
+    -click_count: uint32_t
+    -debounce_state: enum drv_btn_debounce_state_enum
+    -handle_state: enum drv_btn_handle_state_enum
+    +drv_btn_init(): uint32_t
+    +drv_btn_reg_cb_func(): uint32_t
+    +drv_btn_exti_handle(): uint32_t
+    +drv_btn_handle(): uint32_t
+  }
 }
 
 @enduml

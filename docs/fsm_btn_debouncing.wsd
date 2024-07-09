@@ -1,0 +1,13 @@
+@startuml Button FSM Diagram
+hide empty description
+
+[*]--> IDLE
+IDLE --> IDLE : GPIO == gpio_state
+IDLE --> DEBOUNCE : GPIO != gpio_state \n----\n[start t_d]
+
+DEBOUNCE --> DEBOUNCE : t_d < 50
+DEBOUNCE --> IDLE : GPIO == gpio_state\nt_d >= 50
+DEBOUNCE --> IDLE : GPIO != gpio_state\nt_d >= 50\n----\ngpio_state = GPIO
+
+
+@enduml

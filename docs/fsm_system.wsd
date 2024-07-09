@@ -1,0 +1,13 @@
+@startuml
+hide empty description
+
+[*] --> ALL_OFF
+ALL_OFF --> ONLY_LED1_ON: Single click
+ONLY_LED1_ON --> ONLY_LED2_ON: Double click
+ONLY_LED2_ON --> ONLY_LED3_ON: Double click
+ONLY_LED3_ON --> ONLY_LED1_ON: Double click
+ONLY_LED1_ON --> ALL_OFF: Hold
+ONLY_LED2_ON --> ALL_OFF: Hold
+ONLY_LED3_ON --> ALL_OFF: Hold 
+
+@enduml
