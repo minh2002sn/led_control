@@ -26,7 +26,6 @@
 #define SYS_BTN_ERROR   (0xFFFFFFFF)
 #define SYS_BTN_BUFFULL (0xFFFFFFFE) /* Buffer full */
 
-
 /* Public enumerate/structure ----------------------------------------- */
 // Type define enum sys_btn_id_t that has sizeof() = 1
 typedef uint8_t sys_btn_id_t;
@@ -63,16 +62,6 @@ uint32_t sys_btn_init();
  *  - (-1): Error
  */
 uint32_t sys_btn_loop();
-
-
-/**
- * @brief           Send message to system button
- *
- * @return
- *  - (0) : Success
- *  - (-1): Error
- */
-uint32_t sys_btn_send_msg(sys_btn_id_t btn_id, sys_btn_event_t event);
 
 #endif // __SYS_BTN_
 
