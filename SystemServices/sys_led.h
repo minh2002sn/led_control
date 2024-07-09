@@ -19,18 +19,15 @@
 #define __SYS_LED_
 
 /* Includes ----------------------------------------------------------- */
+#include "sys_mng.h"
 #include <stdint.h>
 
 /* Public defines ----------------------------------------------------- */
+#define SYS_LED_SUCCESS (0x00000000)
+#define SYS_LED_ERROR   (0xFFFFFFFF)
+#define SYS_LED_BUFFULL (0xFFFFFFFE) /* Buffer full */
 
 /* Public enumerate/structure ----------------------------------------- */
-typedef enum
-{
-  SYS_LED_EVENT_ALL_OFF,
-  SYS_LED_EVENT_ONLY_LED1_ON,
-  SYS_LED_EVENT_ONLY_LED2_ON,
-  SYS_LED_EVENT_ONLY_LED3_ON,
-} sys_led_event_t;
 
 /* Public macros ------------------------------------------------------ */
 
@@ -49,18 +46,7 @@ uint32_t sys_led_init();
 /**
  * @brief           System led loop() function
  */
-void sys_led_loop();
-
-/**
- * @brief           Send event to system manager
- *
- * @param[in]       event   sys_led_event_t want to send
- *
- * @return
- *  - (0) : Success
- *  - (-1): Error
- */
-uint32_t sys_led_send_event(sys_led_event_t event);
+uint32_t sys_led_loop();
 
 #endif // __SYS_LED_
 
