@@ -48,6 +48,7 @@ static bsp_led_data_t leds_data[] = {
 /* Function definitions ----------------------------------------------- */
 uint32_t bsp_led_init()
 {
+	return BSP_LED_SUCCESS;
 }
 
 uint32_t bsp_led_on(bsp_led_t led)

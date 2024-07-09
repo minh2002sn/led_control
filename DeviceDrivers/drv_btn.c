@@ -129,11 +129,15 @@ uint32_t drv_btn_handle(drv_btn_t *btn)
     // Get current tick
     uint32_t curr_tick = HAL_GetTick();
     // Check changing state condition
-    if ((btn->gpio_state == !btn->active_state) &&
-        (curr_tick - btn->t_start_change < ACTIVE_THRESHOLD))
+    if (btn->gpio_state == !btn->active_state)
     {
-      btn->handle_state   = DRV_BTN_HANDLE_STATE_CHECK_NON_ACTIVE;
-      btn->t_start_change = curr_tick;
+      if (curr_tick - btn->t_start_change < ACTIVE_THRESHOLD)
+      {
+        btn->handle_state   = DRV_BTN_HANDLE_STATE_CHECK_NON_ACTIVE;
+        btn->t_start_change = curr_tick;
+      }
+      else
+        btn->handle_state = DRV_BTN_HANDLE_STATE_IDLE;
     }
     else if ((btn->gpio_state == btn->active_state) &&
              (curr_tick - btn->t_start_change >= HOLD_THRESHOLD))
