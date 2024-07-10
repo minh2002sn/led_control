@@ -1,5 +1,5 @@
 /**
- * @file        sys_led.h
+ * @file        sys_data_mng_topic_define.h
  * @copyright
  * @license
  * @version     0.0.0
@@ -15,8 +15,8 @@
  *
  */
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __SYS_DATA_MNG_COMMON_
-#define __SYS_DATA_MNG_COMMON_
+#ifndef __SYS_DATA_MNG_TOPIC_DEFINE_
+#define __SYS_DATA_MNG_TOPIC_DEFINE_
 
 /* Includes ----------------------------------------------------------- */
 #include <stdint.h>
@@ -34,6 +34,6 @@ typedef uint8_t sys_data_mng_topic_id_t;
 
 /* Public function prototypes ----------------------------------------- */
 
-#endif // __SYS_DATA_MNG_COMMON_
+#endif // __SYS_DATA_MNG_TOPIC_DEFINE_
 
 /* End of file -------------------------------------------------------- */
