@@ -18,6 +18,7 @@
 #include "app.h"
 #include "main.h"
 #include "sys_btn.h"
+#include "sys_data_mng.h"
 #include "sys_led.h"
 #include "sys_mng.h"
 
@@ -63,6 +64,7 @@ int fputc(int ch, FILE *f)
 /* Function definitions ----------------------------------------------- */
 void app_init()
 {
+  sys_data_mng_init();
   sys_mng_init();
   sys_btn_init();
   sys_led_init();
@@ -70,6 +72,7 @@ void app_init()
 
 void app_loop()
 {
+  sys_data_mng_loop();
   sys_mng_loop();
   sys_btn_loop();
   sys_led_loop();
