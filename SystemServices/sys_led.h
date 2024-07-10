@@ -25,7 +25,6 @@
 /* Public defines ----------------------------------------------------- */
 #define SYS_LED_SUCCESS (0x00000000)
 #define SYS_LED_ERROR   (0xFFFFFFFF)
-#define SYS_LED_BUFFULL (0xFFFFFFFE) /* Buffer full */
 
 /* Public enumerate/structure ----------------------------------------- */
 
