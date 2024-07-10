@@ -16,50 +16,56 @@
  */
 /* Define to prevent recursive inclusion ------------------------------ */
 #include "bsp_led.h"
+#include "common.h"
 #include "main.h"
 #include <stdint.h>
 
 /* Private defines ---------------------------------------------------- */
 
-#define ON_STATE  1
-#define OFF_STATE 0
-
 /* Private enumerate/structure ---------------------------------------- */
 typedef struct
 {
   GPIO_TypeDef *gpio_x;
-  uint16_t gpio_pin;
+  uint16_t      gpio_pin;
+  uint32_t      active_state;
 } bsp_led_data_t;
-
-static bsp_led_data_t leds_data[] = {
-  { GPIOD, GPIO_PIN_12 },
-  { GPIOD, GPIO_PIN_13 },
-  { GPIOD, GPIO_PIN_14 }
-};
 
 /* Private macros ----------------------------------------------------- */
 
 /* Public variables --------------------------------------------------- */
 
 /* Private variables -------------------------------------------------- */
+static bsp_led_data_t bled_data[] = {
+  { GPIOD, GPIO_PIN_12, 1 },
+  { GPIOD, GPIO_PIN_13, 1 },
+  { GPIOD, GPIO_PIN_14, 1 }
+};
 
 /* Private function prototypes ---------------------------------------- */
 
 /* Function definitions ----------------------------------------------- */
 uint32_t bsp_led_init()
 {
-	return BSP_LED_SUCCESS;
+  return BSP_LED_SUCCESS;
 }
 
 uint32_t bsp_led_on(bsp_led_t led)
 {
-  HAL_GPIO_WritePin(leds_data[led].gpio_x, leds_data[led].gpio_pin, ON_STATE);
+  // Check input
+  ASSERT((led >= 0) && (led <= (sizeof(bled_data) / sizeof(bsp_led_data_t))), BSP_LED_ERROR);
+
+  HAL_GPIO_WritePin(bled_data[led].gpio_x, bled_data[led].gpio_pin,
+                    bled_data[led].active_state);
   return BSP_LED_SUCCESS;
 }
 
 uint32_t bsp_led_off(bsp_led_t led)
 {
-  HAL_GPIO_WritePin(leds_data[led].gpio_x, leds_data[led].gpio_pin, OFF_STATE);
+  // Check input
+  ASSERT((led >= 0) && (led <= (sizeof(bled_data) / sizeof(bsp_led_data_t))), BSP_LED_ERROR);
+
+  HAL_GPIO_WritePin(bled_data[led].gpio_x, bled_data[led].gpio_pin,
+                    !bled_data[led].active_state);
   return BSP_LED_SUCCESS;
 }
 

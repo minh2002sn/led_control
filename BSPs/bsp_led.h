@@ -26,9 +26,10 @@
 
 typedef enum
 {
-  BSP_LED_0,
+  BSP_LED_0 = 0,
   BSP_LED_1,
-  BSP_LED_2
+  BSP_LED_2,
+  BSP_ALL_LED = 0xFF,
 } bsp_led_t;
 
 enum bsp_led_msg_enum
