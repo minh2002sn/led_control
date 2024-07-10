@@ -19,9 +19,8 @@
 #define __SYS_DATA_MNG_
 
 /* Includes ----------------------------------------------------------- */
-#include "sys_data_mng_common.h"
 #include <stdint.h>
-
+#include "sys_data_mng_topic_define.h"
 
 /* Public defines ----------------------------------------------------- */
 #define SYS_DATA_MNG_SUCCESS (0x00000000)
