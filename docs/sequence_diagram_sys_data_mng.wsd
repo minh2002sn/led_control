@@ -1,0 +1,39 @@
+@startuml
+
+participant ANOTHER as "Another modules"
+participant SYS_MNG as "System manager\n(sys_mng)"
+participant SYS_DATA_MNG as "System data manager\n(sys_data_mng)"
+
+group Create topic
+  SYS_MNG       --> SYS_DATA_MNG: Call sys_mng_create_topic()\nprovide frame size and\nnumber of frame in buffer
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check max number of topics
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check whether the\ntopicsis has existed
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check available size of buffer
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Allocate memory\nfor topic
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Create circular buffer
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Update number of topic and\ntop position of buffer
+end
+
+group Subscribe topic
+  ANOTHER       --> SYS_DATA_MNG: Call sys_data_mng_subscribe_topic()\nprovide callback function
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check whether the\ntopicsis has existed
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check max number of subscribers
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check whether the callback\nfunction has existed
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Store callback function
+end
+
+group Publish topic
+  ANOTHER       --> SYS_DATA_MNG: Call sys_data_mng_publish_topic()
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check whether the\ntopicsis has existed
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check available space in cicular buffer\nDelete lastest frame if not enough space
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Write data to cicular buffer
+end
+
+group loop
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Check number of data in buffer
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Read 1 frame of data if available
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Copy data to a temp buffer to prevent\ncallback function change data
+  SYS_DATA_MNG  --> SYS_DATA_MNG: Call callback function
+end
+
+@enduml

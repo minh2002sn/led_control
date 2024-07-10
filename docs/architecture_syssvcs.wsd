@@ -3,33 +3,37 @@
 package SystemServices <<Frame>> {
   class sys_mng
   {
-    ~mng_state: static sys_mng_state_t
-    ~sys_mng_msg_from_btn_cb: static cbuffer_t
-    ~sys_mng_msg_from_btn_buff[]: static uint8_t
-    +sys_mng_init()
-    +sys_mng_loop()
+    ~smng_state: static sys_mng_state_t
+    +sys_mng_init(): uing32_t
+    +sys_mng_loop(): uint32_t
+    ~sys_mng_topic_btn_cb_func(): void
   }
+
   class sys_btn
   {
-    ~sys_btn_msg_cb: static cbuffer_t
-    ~sys_btn_msg_buff[]: static uint8_t
     +sys_btn_init()
     +sys_btn_loop()
   }
+
   class sys_led
   {
-    ~led_state: static sys_led_state_t
-    ~sys_led_msg_cb: static cbuffer_t
-    ~sys_led_msg_buff[]: static uint8_t
     +sys_led_init(): uint32_t
     +sys_led_loop(): uint32_t
-    ~state_machine_handle(): void
+    ~sys_led_topic_led_cb_func(): void
   }
-  class sys_prot
+
+  class sys_data_mng
   {
-    ~note_cb_ptrs[]: static cbuffer_t *
-    +sys_prot_reg_rx()
-    +sys_prot_send_msg()
+    ~sdatamng_buff[]: static uint8_t
+    ~sdatamng_buff_top: static uint32_t
+    ~sdatamng_topics[]: static uint8_t
+    ~sdatamng_num_topic: static uint32_t
+    ~sdatamng_rx_buff[]: static uint8_t
+    ~sdatamng_param_buff[]: static uint8_t
+    +sys_data_mng_init(): uint32_t
+    +sys_data_mng_create_topic(): uint32_t
+    +sys_data_mng_subscribe_topic(): uint32_t
+    +sys_data_mng_publish_topic(): uint32_t
   }
 }
 

@@ -15,6 +15,7 @@ package BSPs <<Frame>> {
   
   class bsp_led
   {
+    ~bled_data[]: static bsp_led_data_t
     +bsp_led_init(): uint32_t
     +bsp_led_on(): uint32_t
     +bsp_led_off(): uint32_t
