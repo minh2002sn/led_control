@@ -45,7 +45,10 @@ static uint8_t                   sdatamng_buff[SYS_DATA_MNG_BUFF_SIZE];
 static uint32_t                  sdatamng_buff_top;
 static sys_data_mng_topic_data_t sdatamng_topics[SYS_DATA_MNG_MAX_NUM_TOPIC];
 static uint32_t                  sdatamng_num_topic;
-static uint8_t                   sdatamng_rx_buff[SYS_DATA_MNG_BUFF_SIZE];
+// Buffer to store data from circular buffer
+static uint8_t sdatamng_rx_buff[SYS_DATA_MNG_BUFF_SIZE];
+// Buffer has data copied from sdatamng_rx_buff, use as parameter for callback function
+static uint8_t sdatamng_param_buff[SYS_DATA_MNG_BUFF_SIZE];
 /* Private function prototypes ---------------------------------------- */
 
 /* Function definitions ----------------------------------------------- */
@@ -58,12 +61,16 @@ uint32_t sys_data_mng_loop()
 {
   for (int i = 0; i < sdatamng_num_topic; i++)
   {
+    // Check number of data in buffer
     if ((cb_data_count(&sdatamng_topics[i].cir_buff) / sdatamng_topics[i].frame_size) >= 1)
     {
       cb_read(&sdatamng_topics[i].cir_buff, sdatamng_rx_buff, sdatamng_topics[i].frame_size);
       for (int j = 0; j < sdatamng_topics[i].num_subscriber; j++)
       {
-        sdatamng_topics[i].cb_funcs[j](sdatamng_rx_buff, sdatamng_topics[i].frame_size);
+        // Copy sdatamng_rx_buff data to sdatamng_param_buff
+        memcpy(sdatamng_param_buff, sdatamng_rx_buff, sdatamng_topics[i].frame_size);
+        // Call callback function
+        sdatamng_topics[i].cb_funcs[j](sdatamng_param_buff, sdatamng_topics[i].frame_size);
       }
     }
   }
@@ -93,7 +100,8 @@ uint32_t sys_data_mng_create_topic(sys_data_mng_topic_id_t topic_id,
                 (sdatamng_buff + sdatamng_buff_top), size_of_frame * num_of_frame);
   ASSERT(ret == CB_SUCCESS, SYS_DATA_MNG_ERROR);
 
-  // Store size of frame
+  // Store topic data
+  sdatamng_topics[sdatamng_num_topic].topic_id   = topic_id;
   sdatamng_topics[sdatamng_num_topic].frame_size = size_of_frame;
 
   // Update sdatamng_num_topic
@@ -162,8 +170,8 @@ uint32_t sys_data_mng_publish_topic(sys_data_mng_topic_id_t topic_id, uint8_t *d
          cb_space_count(&sdatamng_topics[topic_index].cir_buff),
          SYS_DATA_MNG_ERROR);
 
-  if (sdatamng_topics[topic_index].frame_size <=
-      cb_space_count(&sdatamng_topics[topic_index].cir_buff))
+  if (cb_space_count(&sdatamng_topics[topic_index].cir_buff) <=
+      sdatamng_topics[topic_index].frame_size)
   {
     cb_read(&sdatamng_topics[topic_index].cir_buff, sdatamng_rx_buff,
             sdatamng_topics[topic_index].frame_size);
