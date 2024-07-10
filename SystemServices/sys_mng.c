@@ -16,17 +16,26 @@
  */
 /* Define to prevent recursive inclusion ------------------------------ */
 #include "sys_mng.h"
-#include "cbuffer.h"
 #include "common.h"
+#include "sys_data_mng.h"
+#include "sys_data_mng_topic_define.h"
+#include "sys_data_mng_msg_frame.h"
 #include "sys_led.h"
 
 /* Private defines ---------------------------------------------------- */
-#define SYS_MNG_CBUFFER_SIZE (32) /* Size of circular buffer */
+// Number of frame in topic button buffer
+#define SYS_MNG_NUM_FRAME_TOPIC_BTN_BUFF (8)
+// Number of frame in topic LED buffer
+#define SYS_MNG_NUM_FRAME_TOPIC_LED_BUFF (8)
 
 /* Private enumerate/structure ---------------------------------------- */
+
 typedef enum
 {
-  SYS_MNG_STATE_IDLE
+  SYS_MNG_STATE_ALL_OFF,
+  SYS_MNG_STATE_ONLY_LED1_ON,
+  SYS_MNG_STATE_ONLY_LED2_ON,
+  SYS_MNG_STATE_ONLY_LED3_ON,
 } sys_mng_state_t;
 
 /* Private macros ----------------------------------------------------- */
@@ -34,56 +43,113 @@ typedef enum
 /* Public variables --------------------------------------------------- */
 
 /* Private variables -------------------------------------------------- */
-static sys_mng_state_t mng_state = SYS_MNG_STATE_IDLE;
-static cbuffer_t       sys_mng_msg_from_btn_cb;
-static uint8_t         sys_mng_msg_from_btn_buff[SYS_MNG_CBUFFER_SIZE];
+static sys_mng_state_t smng_state = SYS_MNG_STATE_ALL_OFF;
 
 /* Private function prototypes ---------------------------------------- */
+static void sys_mng_topic_btn_cb_func(uint8_t *data, uint32_t size);
 
 /* Function definitions ----------------------------------------------- */
 uint32_t sys_mng_init()
 {
   uint32_t ret;
 
-  // Init circular buffer
-  ret = cb_init(&sys_mng_msg_from_btn_cb, sys_mng_msg_from_btn_buff, SYS_MNG_CBUFFER_SIZE);
-  ASSERT(ret == CB_SUCCESS, SYS_MNG_ERROR);
+  // Create system data manager's topic
+  ret = sys_data_mng_create_topic(SYS_DATA_MNG_TOPIC_BTN,
+                                  sizeof(sys_mng_topic_btn_msg_frame_t),
+                                  SYS_MNG_NUM_FRAME_TOPIC_BTN_BUFF);
+  ASSERT(ret == SYS_DATA_MNG_SUCCESS, SYS_MNG_ERROR);
 
-  // Register receiving
-  ret = sys_prot_reg_rx(SYS_PROT_NOTE_SYS_MNG, &sys_mng_msg_from_btn_cb);
-  ASSERT(ret == SYS_PROT_SUCCESS, SYS_MNG_ERROR);
+  ret = sys_data_mng_create_topic(SYS_DATA_MNG_TOPIC_LED,
+                                  sizeof(sys_mng_topic_led_msg_frame_t),
+                                  SYS_MNG_NUM_FRAME_TOPIC_LED_BUFF);
+  ASSERT(ret == SYS_DATA_MNG_SUCCESS, SYS_MNG_ERROR);
+
+  // Subscribe for receiving data in topic button
+  ret = sys_data_mng_subscribe_topic(SYS_DATA_MNG_TOPIC_BTN, sys_mng_topic_btn_cb_func);
+  ASSERT(ret == SYS_DATA_MNG_SUCCESS, SYS_MNG_ERROR);
 
   return SYS_MNG_SUCCESS;
 }
 
 uint32_t sys_mng_loop()
 {
-  sys_mng_msg_t msg;
-
-  // Read message from circular buffer
-  if ((cb_data_count(&sys_mng_msg_from_btn_cb) / sizeof(sys_mng_msg_t)) >= 1)
-  {
-    cb_read(&sys_mng_msg_from_btn_cb, &msg, sizeof(msg));
-
-    // Check source id
-    ASSERT(msg.src_id == SYS_PROT_NOTE_SYS_BTN, SYS_MNG_ERROR);
-    // Process message
-    switch (mng_state)
-    {
-    case SYS_MNG_STATE_IDLE:
-      // Message process
-      sys_prot_send_msg(SYS_PROT_NOTE_SYS_MNG, SYS_PROT_NOTE_SYS_LED,
-                        (uint8_t *)&msg.event, sizeof(msg.event));
-      break;
-
-    default:
-      break;
-    }
-  }
-
   return SYS_MNG_SUCCESS;
 }
 
 /* Private definitions ----------------------------------------------- */
+static void sys_mng_topic_btn_cb_func(uint8_t *data, uint32_t size)
+{
+  switch (smng_state)
+  {
+  case SYS_MNG_STATE_ALL_OFF:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_SINGLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_ON;
+      msg.led   = BSP_LED_0;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED1_ON;
+    }
+    break;
+
+  case SYS_MNG_STATE_ONLY_LED1_ON:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_DOUBLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_ON;
+      msg.led   = BSP_LED_1;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED2_ON;
+    }
+    else if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_HOLD)
+    {
+      smng_state = SYS_MNG_STATE_ALL_OFF;
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+    }
+    break;
+
+  case SYS_MNG_STATE_ONLY_LED2_ON:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_DOUBLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_ON;
+      msg.led   = BSP_LED_2;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED3_ON;
+    }
+    else if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_HOLD)
+    {
+      smng_state = SYS_MNG_STATE_ALL_OFF;
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+    }
+    break;
+
+  case SYS_MNG_STATE_ONLY_LED3_ON:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_DOUBLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_ON;
+      msg.led   = BSP_LED_0;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED1_ON;
+    }
+    else if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_HOLD)
+    {
+      smng_state = SYS_MNG_STATE_ALL_OFF;
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_OFF, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+    }
+    break;
+
+  default:
+    break;
+  }
+}
 
 /* End of file -------------------------------------------------------- */
