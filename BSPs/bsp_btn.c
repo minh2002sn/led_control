@@ -21,25 +21,26 @@
 #include "common.h"
 #include "drv_btn.h"
 #include "main.h"
-#include "sys_btn.h"
-#include "sys_prot.h"
+#include "sys_data_mng.h"
+#include "sys_mng.h"
+#include "sys_data_mng_msg_frame.h"
 
 /* Private defines ---------------------------------------------------- */
-#define BTN_ACTIVE_STATE 1 /* Active state of buttons */
 
 /* Private enumerate/structure ---------------------------------------- */
 typedef struct
 {
   GPIO_TypeDef *gpio_x;
   uint16_t      gpio_pin;
+  uint32_t      active_state;
   drv_btn_t     btn;
 } bsp_led_data_t;
 
 /* Private macros ----------------------------------------------------- */
 
 /* Public variables --------------------------------------------------- */
-static bsp_led_data_t btns_data[] = {
-  { GPIOA, GPIO_PIN_0 }
+static bsp_led_data_t bbtn_data[] = {
+  { GPIOA, GPIO_PIN_0, 1 }
 };
 
 /* Private variables -------------------------------------------------- */
@@ -71,8 +72,8 @@ uint32_t bsp_btn_init()
   uint32_t ret;
 
   // Initialize button GPIO pin, active state
-  ret = drv_btn_init(&btns_data[0].btn, btns_data[0].gpio_x,
-                     btns_data[0].gpio_pin, BTN_ACTIVE_STATE);
+  ret = drv_btn_init(&bbtn_data[0].btn, bbtn_data[0].gpio_x,
+                     bbtn_data[0].gpio_pin, bbtn_data[0].active_state);
   ASSERT(ret == DRV_BTN_SUCCESS, BSP_BTN_ERROR);
 
   // Register callback function for each button events
@@ -86,7 +87,7 @@ uint32_t bsp_btn_init()
 uint32_t bsp_btn_loop()
 {
   uint32_t ret;
-  ret = drv_btn_handle(&btns_data[0].btn);
+  ret = drv_btn_handle(&bbtn_data[0].btn);
   ASSERT(ret == DRV_BTN_SUCCESS, BSP_BTN_ERROR);
 
   return BSP_BTN_SUCCESS;
@@ -95,7 +96,7 @@ uint32_t bsp_btn_loop()
 uint32_t bsp_btn_exti_handle(uint16_t exti_line)
 {
   uint32_t ret;
-  ret = drv_btn_exti_handle(&btns_data[0].btn, exti_line);
+  ret = drv_btn_exti_handle(&bbtn_data[0].btn, exti_line);
 
   ASSERT(ret == DRV_BTN_SUCCESS, BSP_BTN_ERROR);
 
@@ -105,26 +106,26 @@ uint32_t bsp_btn_exti_handle(uint16_t exti_line)
 /* Private definitions ----------------------------------------------- */
 void bsp_btn_cb_func_single_click(drv_btn_t *btn)
 {
-  uint8_t data[] = { SYS_BTN_BTN0, SYS_BTN_EVENT_SINGLE_CLICK };
-  sys_prot_send_msg(SYS_PROT_NOTE_BSP_BTN, SYS_PROT_NOTE_SYS_BTN, data, sizeof(data));
+  sys_mng_topic_btn_msg_frame_t msg = { SYS_MNG_BTN_EVENT_SINGLE_CLICK };
+  sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_BTN, (uint8_t *)&msg, sizeof(msg));
 }
 
 void bsp_btn_cb_func_double_click(drv_btn_t *btn)
 {
-  uint8_t data[] = { SYS_BTN_BTN0, SYS_BTN_EVENT_DOUBLE_CLICK };
-  sys_prot_send_msg(SYS_PROT_NOTE_BSP_BTN, SYS_PROT_NOTE_SYS_BTN, data, sizeof(data));
+  uint8_t msg = { SYS_MNG_BTN_EVENT_DOUBLE_CLICK };
+  sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_BTN, (uint8_t *)&msg, sizeof(msg));
 }
 
 void bsp_btn_cb_func_hold(drv_btn_t *btn)
 {
-  uint8_t data[] = { SYS_BTN_BTN0, SYS_BTN_EVENT_HOLD };
-  sys_prot_send_msg(SYS_PROT_NOTE_BSP_BTN, SYS_PROT_NOTE_SYS_BTN, data, sizeof(data));
+  uint8_t msg = { SYS_MNG_BTN_EVENT_HOLD };
+  sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_BTN, (uint8_t *)&msg, sizeof(msg));
 }
 
 void bsp_btn_cb_func_release(drv_btn_t *btn)
 {
-  uint8_t data[] = { SYS_BTN_BTN0, SYS_BTN_EVENT_RELEASE };
-  sys_prot_send_msg(SYS_PROT_NOTE_BSP_BTN, SYS_PROT_NOTE_SYS_BTN, data, sizeof(data));
+  uint8_t msg = { SYS_MNG_BTN_EVENT_RELEASE };
+  sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_BTN, (uint8_t *)&msg, sizeof(msg));
 }
 
 /* End of file -------------------------------------------------------- */
