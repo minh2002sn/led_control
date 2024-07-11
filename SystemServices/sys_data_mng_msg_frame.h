@@ -34,8 +34,10 @@ typedef uint8_t sys_mng_btn_event_t;
 
 // Type define enum sys_mng_led_event_t that has sizeof() = 1
 typedef uint8_t sys_mng_led_event_t;
-#define SYS_MNG_LED_EVENT_ON  ((sys_mng_led_event_t)0x00)
-#define SYS_MNG_LED_EVENT_OFF ((sys_mng_led_event_t)0x01)
+#define SYS_MNG_LED_EVENT_ON          ((sys_mng_led_event_t)0x00)
+#define SYS_MNG_LED_EVENT_OFF         ((sys_mng_led_event_t)0x01)
+#define SYS_MNG_LED_EVENT_START_BLINK ((sys_mng_led_event_t)0x02)
+#define SYS_MNG_LED_EVENT_STOP_BLINK  ((sys_mng_led_event_t)0x03)
 
 // Message frame for topic button
 typedef struct __attribute__((packed))
