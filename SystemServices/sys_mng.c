@@ -18,8 +18,8 @@
 #include "sys_mng.h"
 #include "common.h"
 #include "sys_data_mng.h"
-#include "sys_data_mng_topic_define.h"
 #include "sys_data_mng_msg_frame.h"
+#include "sys_data_mng_topic_define.h"
 #include "sys_led.h"
 
 /* Private defines ---------------------------------------------------- */
@@ -30,6 +30,7 @@
 
 /* Private enumerate/structure ---------------------------------------- */
 
+#ifdef USE_OLD_VERSION
 typedef enum
 {
   SYS_MNG_STATE_ALL_OFF,
@@ -37,6 +38,17 @@ typedef enum
   SYS_MNG_STATE_ONLY_LED2_ON,
   SYS_MNG_STATE_ONLY_LED3_ON,
 } sys_mng_state_t;
+
+#else
+typedef enum
+{
+  SYS_MNG_STATE_ALL_OFF,
+  SYS_MNG_STATE_ONLY_LED0_BLINK,
+  SYS_MNG_STATE_ONLY_LED1_BLINK,
+  SYS_MNG_STATE_ONLY_LED2_BLINK,
+} sys_mng_state_t;
+
+#endif
 
 /* Private macros ----------------------------------------------------- */
 
@@ -77,6 +89,81 @@ uint32_t sys_mng_loop()
 }
 
 /* Private definitions ----------------------------------------------- */
+#ifndef USE_OLD_VERSION
+
+static void sys_mng_topic_btn_cb_func(uint8_t *data, uint32_t size)
+{
+  switch (smng_state)
+  {
+  case SYS_MNG_STATE_ALL_OFF:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_SINGLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_START_BLINK, BSP_LED_0 };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED0_BLINK;
+    }
+    break;
+
+  case SYS_MNG_STATE_ONLY_LED0_BLINK:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_DOUBLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_STOP_BLINK, BSP_LED_0 };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_START_BLINK;
+      msg.led   = BSP_LED_1;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED1_BLINK;
+    }
+    else if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_HOLD)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_STOP_BLINK, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ALL_OFF;
+    }
+    break;
+
+  case SYS_MNG_STATE_ONLY_LED1_BLINK:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_DOUBLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_STOP_BLINK, BSP_LED_1 };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_START_BLINK;
+      msg.led   = BSP_LED_2;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED2_BLINK;
+    }
+    else if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_HOLD)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_STOP_BLINK, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ALL_OFF;
+    }
+    break;
+
+  case SYS_MNG_STATE_ONLY_LED2_BLINK:
+    if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_DOUBLE_CLICK)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_STOP_BLINK, BSP_LED_2 };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      msg.event = SYS_MNG_LED_EVENT_START_BLINK;
+      msg.led   = BSP_LED_0;
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ONLY_LED0_BLINK;
+    }
+    else if ((sys_mng_btn_event_t)(*data) == SYS_MNG_BTN_EVENT_HOLD)
+    {
+      sys_mng_topic_led_msg_frame_t msg = { SYS_MNG_LED_EVENT_STOP_BLINK, BSP_ALL_LED };
+      sys_data_mng_publish_topic(SYS_DATA_MNG_TOPIC_LED, (uint8_t *)&msg, sizeof(msg));
+      smng_state = SYS_MNG_STATE_ALL_OFF;
+    }
+    break;
+
+  default:
+    break;
+  }
+}
+
+#else
 static void sys_mng_topic_btn_cb_func(uint8_t *data, uint32_t size)
 {
   switch (smng_state)
@@ -151,5 +238,6 @@ static void sys_mng_topic_btn_cb_func(uint8_t *data, uint32_t size)
     break;
   }
 }
+#endif
 
 /* End of file -------------------------------------------------------- */
