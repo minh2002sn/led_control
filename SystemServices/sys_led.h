@@ -19,6 +19,7 @@
 #define __SYS_LED_
 
 /* Includes ----------------------------------------------------------- */
+#include "main.h"
 #include "sys_mng.h"
 #include <stdint.h>
 
@@ -40,7 +41,7 @@
  *  - (0) : Success
  *  - (-1): Error
  */
-uint32_t sys_led_init();
+uint32_t sys_led_init(TIM_HandleTypeDef *htim);
 
 /**
  * @brief           System led loop() function
