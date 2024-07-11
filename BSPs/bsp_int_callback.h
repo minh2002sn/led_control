@@ -1,5 +1,5 @@
 /**
- * @file        bsp_exti.h
+ * @file        bsp_int_callback.h
  * @copyright
  * @license
  * @version     0.0.0
@@ -15,8 +15,8 @@
  *
  */
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_EXTI_
-#define __BSP_EXTI_
+#ifndef __BSP_INT_CALLBACK_
+#define __BSP_INT_CALLBACK_
 
 /* Includes ----------------------------------------------------------- */
 #include <stdint.h>
@@ -31,6 +31,6 @@
 
 /* Public function prototypes ----------------------------------------- */
 
-#endif // __BSP_EXTI_
+#endif // __BSP_INT_CALLBACK_
 
 /* End of file -------------------------------------------------------- */
