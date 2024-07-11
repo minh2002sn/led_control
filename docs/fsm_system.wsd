@@ -2,12 +2,12 @@
 hide empty description
 
 [*] --> ALL_OFF
-ALL_OFF --> ONLY_LED1_ON: Single click
-ONLY_LED1_ON --> ONLY_LED2_ON: Double click
-ONLY_LED2_ON --> ONLY_LED3_ON: Double click
-ONLY_LED3_ON --> ONLY_LED1_ON: Double click
-ONLY_LED1_ON --> ALL_OFF: Hold
-ONLY_LED2_ON --> ALL_OFF: Hold
-ONLY_LED3_ON --> ALL_OFF: Hold 
+ALL_OFF --> ONLY_LED0_BLINK: Single click
+ONLY_LED0_BLINK --> ONLY_LED1_BLINK: Double click
+ONLY_LED1_BLINK --> ONLY_LED2_BLINK: Double click
+ONLY_LED2_BLINK --> ONLY_LED0_BLINK: Double click
+ONLY_LED0_BLINK --> ALL_OFF: Hold
+ONLY_LED1_BLINK --> ALL_OFF: Hold
+ONLY_LED2_BLINK --> ALL_OFF: Hold 
 
 @enduml
