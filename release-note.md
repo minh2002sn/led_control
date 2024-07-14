@@ -1,5 +1,10 @@
 # LED Control Release Notes
 
+## **v0.2.1**
+
+* Fix button debouncing time error in button driver.
+* Remove checking active field in cb_read and cb_write function.
+
 ## **v0.2.0**
 
 * Change from turn on/off led to blink led.
