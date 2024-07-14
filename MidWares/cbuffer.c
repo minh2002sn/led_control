@@ -94,10 +94,6 @@ uint32_t cb_read(cbuffer_t *cb, void *buf, uint32_t nbytes)
   if (buf == NULL)
     return CB_ERROR;
 
-  if (!cb->active)
-    return CB_BUSY;
-  cb->active = 0;
-
   data_count = cb_data_count(cb);
   if (data_count >= nbytes)
     num_avail_bytes = nbytes;
@@ -109,7 +105,6 @@ uint32_t cb_read(cbuffer_t *cb, void *buf, uint32_t nbytes)
     cb_read_byte(cb, (uint8_t *)buf + i);
   }
 
-  cb->active = 1;
   return num_avail_bytes;
 }
 
@@ -122,10 +117,6 @@ uint32_t cb_write(cbuffer_t *cb, void *buf, uint32_t nbytes)
 
   if (buf == NULL)
     return CB_ERROR;
-
-  if (!cb->active)
-    return CB_BUSY;
-  cb->active = 0;
 
   space_count = cb_space_count(cb);
   if (space_count >= nbytes)
@@ -144,7 +135,6 @@ uint32_t cb_write(cbuffer_t *cb, void *buf, uint32_t nbytes)
     cb_write_byte(cb, *((uint8_t *)buf + i));
   }
 
-  cb->active = 1;
   return num_avail_bytes;
 }
 
