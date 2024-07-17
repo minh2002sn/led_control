@@ -21,7 +21,10 @@
 #include <stdint.h>
 
 /* Private defines ---------------------------------------------------- */
-#define TIMX_CR1_CEN_MASK (0x00000001) // Counter enable bit
+#define TIMX_CR1_CEN_MASK     (0x00000001) // Counter enable bit
+#define TIMX_CCMR1_OC1PE_MASK (0x00000008) // Output compare 1 preload enable
+#define TIMX_CCMR1_OC2PE_MASK (0x00000800) // Output compare 2 preload enable
+#define TIMX_CCMR2_OC3PE_MASK (0x00000008) // Output compare 3 preload enable
 
 /* Private enumerate/structure ---------------------------------------- */
 typedef struct
@@ -73,9 +76,23 @@ uint32_t bsp_led_init(TIM_HandleTypeDef *htim)
   bled_data[1].htim = htim;
   bled_data[2].htim = htim;
 
+  /* Set value for CCR1 register */
+  // Clear OC1PE bit to directly set value for CCR1 register
+  htim->Instance->CCMR1 &= ~TIMX_CCMR1_OC1PE_MASK;
+  // Set value for CCR1 register
   bled_data[0].htim->Instance->CCR1 = 5000;
+  // Set OC1PE bit to enable updating CCR1 value at each rising edge
+  htim->Instance->CCMR1 |= TIMX_CCMR1_OC1PE_MASK;
+
+  /* Set value for CCR2 register */
+  htim->Instance->CCMR1 &= ~TIMX_CCMR1_OC2PE_MASK;
   bled_data[1].htim->Instance->CCR2 = 5000;
+  htim->Instance->CCMR1 |= TIMX_CCMR1_OC2PE_MASK;
+
+  /* Set value for CCR3 register */
+  htim->Instance->CCMR2 &= ~TIMX_CCMR2_OC3PE_MASK;
   bled_data[2].htim->Instance->CCR3 = 5000;
+  htim->Instance->CCMR2 |= TIMX_CCMR2_OC3PE_MASK;
 
   return BSP_LED_SUCCESS;
 }
@@ -122,6 +139,7 @@ uint32_t bsp_led_start_blink(bsp_led_t led)
   // Check whether timer has started counting
   if (!(bled_data[led].htim->Instance->CR1 & TIMX_CR1_CEN_MASK))
   {
+    bled_data[led].htim->Instance->CNT = 0;
     bled_data[led].htim->Instance->DIER |= TIMX_DIER_CCXIE_MASK(led);
     bled_data[led].htim->Instance->CCER |= TIMX_CCER_CCXE_MASK(led);
     bled_data[led].htim->Instance->CR1 |= TIMX_CR1_CEN_MASK;
