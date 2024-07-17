@@ -101,7 +101,7 @@ uint32_t drv_btn_handle(drv_btn_t *btn)
   // Debounce
   if (btn->debounce_state == DRV_BTN_DEBOUNCE_STATE_DEBOUNCE)
   {
-    if (HAL_GetTick() - btn->debounce_state >= DEBOUNCING_TIME)
+    if (HAL_GetTick() - btn->t_start_debounce >= DEBOUNCING_TIME)
     {
       uint32_t curr_gpio_state = HAL_GPIO_ReadPin(btn->gpio_x, btn->gpio_pin);
       if (curr_gpio_state != btn->gpio_state)
